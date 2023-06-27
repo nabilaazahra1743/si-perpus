@@ -48,23 +48,7 @@ export default function Home() {
     }
   };
 
-  //API
-  // const getBukuList = async () => {
-  //   try {
-  //     const response = await fetch(`https://ekadyar.com/rest/book/list`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const data = await response.json();
-  //     setBuku(data);
-  //     console.log();
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  useEffect(() => {
+    useEffect(() => {
     getBukuList();
   }, []);
 
@@ -74,6 +58,11 @@ export default function Home() {
     getBukuList();
   };
 
+  
+  const [search, setSearch] = useState("");
+
+  
+
   return (
     <Layout>
       <div className="flex justify-center mx-3">
@@ -82,12 +71,23 @@ export default function Home() {
           <div className="mt-10 mb-10">
             <h3 className="text-2xl font-semibold">Data Buku Perpustakaan</h3>
           </div>
+          <div className="flex justify-between">
           <button
             onClick={addBookHandler}
             className="bg-sky-500 text-white px-6 py-2 rounded-full hover:bg-sky-700"
           >
             Tambah Buku
           </button>
+
+          <input
+            type="text"
+            className="w-42 mt-2 rounded-xl border px-3 py-2"
+            onChange={(e) => setSearch(e.target.value)}
+           placeholder="ketik keryword"
+          />
+
+          </div>
+          
           {/* tabel */}
           <div className="mt-5">
             <table className="table-auto bg-sky-50 py-10 rounded-xl ">
@@ -101,7 +101,11 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {buku.map((data) => (
+                {buku
+                  .filter((data)=>
+                    data.nama_buku?.toLowerCase().includes(search)
+                  )
+                  .map((data) => (
                   <tr className="hover:bg-sky-200" key={data.id}>
                     <td className="px-6 py-3">{data.nama_buku}</td>
                     <td className="px-6 py-3">{data.pengarang}</td>
@@ -126,7 +130,59 @@ export default function Home() {
                       </span>
                     </td>
                   </tr>
-                ))}
+                    ) 
+                  )}
+              </tbody>
+              
+              <tbody>
+                {buku.length>= 1 ?
+                  (buku
+                    .filter((data) =>
+                      data.nama_buku.toLowerCase().includes(search)
+                    )
+                    .map((data) => (
+                      <tr className="hover:bg-sky-200" key={data.id}>
+                        <td scope="col" className="px-6 py-3">
+                          {data.nama_buku}
+                        </td>
+                        <td scope="col" className="px-6 py-3">
+                          {data.pengarang}
+                        </td>
+                        <td scope="col" className="px-6 py-3">
+                          {data.deskripsi_buku}
+                        </td>
+                        <td scope="col" className="px-6 py-3">
+                          {data.tahun_terbit}
+                        </td>
+                        <td scope="col" className="flex px-6 py-3">
+                          <span
+                            className="hover: mr-2 h-8 w-8 cursor-pointer hover:text-sky-500"
+                            onClick={()=>{
+                            updateBookHandler(data.id);
+                            }}>
+                          </span>
+                          <span
+                            className="h-8 w-8 cursor-pointer hover:text-red-500"
+                            onClick={()=>{
+                              deleteBuku(data.id);
+                            }}
+                          >
+                            <IkonHapus />
+                          </span>
+                        </td>
+                      </tr>
+                      )                      
+                    )
+                    
+                  ) : (
+                    <tr>
+                      <td className="py-5 text-center" colSpan={6}>
+                        Belum ada data buku!
+                      </td>
+                    </tr>
+                  )
+                
+                  }
               </tbody>
             </table>
           </div>
